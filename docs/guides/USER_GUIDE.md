@@ -21,13 +21,20 @@ You need **one free API key** from Blockfrost. This is what connects the app to 
 
 ## Step 2 — Download the Code
 
-Open Terminal and run:
+Open **Terminal** (press **Cmd+Space**, type `Terminal`, press Enter).
+
+Make sure you are in your home folder first — copy and paste this **entire block** at once:
 
 ```bash
+cd ~
 git clone https://github.com/carpefukendiem/SAP-Cardano-OData-V4-API-with-CAP-SAP-Cardano-SDK.git
 cd SAP-Cardano-OData-V4-API-with-CAP-SAP-Cardano-SDK
 git pull origin claude/cardano-blockchain-solution-t4wNO
 ```
+
+> **Important:** The `cd ~` at the start ensures you download the project to your home folder (`/Users/yourname/`), not inside another folder by mistake. Do not skip this line.
+
+After this you will be inside the project folder. **Stay in this folder** for all the remaining steps — do not `cd` anywhere else and do not run `git clone` again.
 
 ---
 
@@ -163,8 +170,10 @@ cf push sap-cardano-odata --buildpack nodejs_buildpack
 |---|---|
 | `cp: .env.example: No such file or directory` | Run `git pull origin claude/cardano-blockchain-solution-t4wNO` first |
 | `npm: command not found` | Install Node.js from https://nodejs.org (choose the LTS version) |
+| `EACCES: permission denied` on `node_modules` | You ran `npm install` from the wrong folder or with sudo. Run: `cd ~/SAP-Cardano-OData-V4-API-with-CAP-SAP-Cardano-SDK && sudo chown -R $(whoami) . && npm install` |
+| Path contains the folder name more than once (e.g. `.../SAP-.../SAP-.../`) | You cloned inside the project folder. Run `cd ~` first, then `git clone ...` again |
 | `401 Unauthorized` from blockchain calls | Your Blockfrost key is wrong — double-check Step 1 and 3 |
-| Port 4004 already in use | Run `lsof -ti:4004 | xargs kill` to free the port |
+| Port 4004 already in use | Run `lsof -ti:4004 \| xargs kill` to free the port |
 | TextEdit opens in rich text mode | In TextEdit go to Format → Make Plain Text before editing |
 
 ---
