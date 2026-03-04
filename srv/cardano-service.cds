@@ -62,6 +62,7 @@ service CardanoODataService @(path: '/odata/v4/cardano-odata') {
   // SAP SMART CONTRACT ENTITIES
   // ============================================================
 
+  @cds.redirection.target
   entity SupplyChainEvents as projection on db.SupplyChainEvents;
   entity SupplyChainCheckpoints as projection on db.SupplyChainCheckpoints;
 
