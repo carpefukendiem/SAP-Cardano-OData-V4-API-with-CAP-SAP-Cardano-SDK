@@ -1,0 +1,80 @@
+name: Test Suite
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Run Tests (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.x', '22.x']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Run linter
+        run: npm run lint || true
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage
+        env:
+          NODE_ENV: test
+
+      - name: Run integration tests
+        run: npm run test:integration -- --coverage
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '22.x'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  aiken-contracts:
+    name: Build & Test Aiken Smart Contracts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Aiken
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aiken-lang/aiken/releases/latest/download/aiken-installer.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Check Aiken version
+        run: aiken --version
+
+      - name: Build Aiken contracts
+        working-directory: ./aiken-contracts
+        run: aiken build
+
+      - name: Run Aiken tests
+        working-directory: ./aiken-contracts
+        run: aiken check
+
+      - name: Generate Aiken docs
+        working-directory: ./aiken-contracts
+        run: aiken docs --output ../docs/aiken-api || true

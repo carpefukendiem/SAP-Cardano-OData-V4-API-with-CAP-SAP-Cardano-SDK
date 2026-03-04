@@ -1,0 +1,14 @@
+name = "sap-cardano-contracts"
+version = "1.0.0"
+license = "Apache-2.0"
+description = "SAP-Cardano OData V4 API smart contracts for enterprise blockchain integration"
+
+[repository]
+user = "ODATANO"
+project = "sap-cardano-contracts"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "v2.1.0"
+source = "github"

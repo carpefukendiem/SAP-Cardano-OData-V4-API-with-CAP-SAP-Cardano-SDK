@@ -1,0 +1,82 @@
+erDiagram
+    Transactions {
+        string txHash PK
+        string blockHash FK
+        int blockHeight
+        datetime blockTime
+        bigint fees
+        boolean isValid
+    }
+    TransactionInputs {
+        uuid ID PK
+        string txHash FK
+        int outputIndex
+        string address
+        bigint lovelace
+    }
+    TransactionOutputs {
+        uuid ID PK
+        string txHash FK
+        int outputIndex
+        string address
+        bigint lovelace
+    }
+    Addresses {
+        string address PK
+        bigint lovelace
+        int utxoCount
+        int txCount
+    }
+    SupplyChainEvents {
+        string sapDocumentId PK
+        string sapSystemId
+        string status
+        string productCode
+        int quantity
+    }
+    SupplyChainCheckpoints {
+        uuid ID PK
+        string sapDocumentId FK
+        string locationCode
+        datetime timestamp
+    }
+    EsgCredits {
+        string creditId PK
+        string creditType
+        bigint amount
+        string unit
+        int vintageYear
+        boolean isRetired
+    }
+    PaymentSettlements {
+        string settlementId PK
+        string sapInvoiceId
+        string status
+        bigint totalAmount
+    }
+    SettlementParties {
+        uuid ID PK
+        string settlementId FK
+        string address
+        bigint amount
+        boolean hasApproved
+    }
+    AssetRegistry {
+        string assetId PK
+        string sapAssetNumber
+        string ownerAddress
+        string state
+        bigint quantity
+    }
+    OracleData {
+        string oracleId PK
+        string dataType
+        bigint value
+        bigint denominator
+        datetime validUntil
+    }
+
+    Transactions ||--o{ TransactionInputs : "has"
+    Transactions ||--o{ TransactionOutputs : "has"
+    SupplyChainEvents ||--o{ SupplyChainCheckpoints : "has"
+    PaymentSettlements ||--o{ SettlementParties : "has"

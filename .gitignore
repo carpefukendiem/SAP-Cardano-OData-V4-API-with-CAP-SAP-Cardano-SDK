@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+.DS_Store
+.vscode/
+*.sqlite
+gen/
+aiken-contracts/build/
+aiken-contracts/.aiken/
+docs/aiken-api/

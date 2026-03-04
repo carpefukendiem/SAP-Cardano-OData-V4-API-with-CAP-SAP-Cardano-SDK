@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  sap-cardano-odata:
+    build: .
+    image: sap-cardano-odata:latest
+    container_name: sap-cardano-odata
+    ports:
+      - "4004:4004"
+    environment:
+      - NODE_ENV=production
+      - PORT=4004
+      - DEFAULT_CARDANO_NETWORK=preview
+      - BLOCKFROST_PROJECT_ID_PREVIEW=${BLOCKFROST_PROJECT_ID_PREVIEW}
+      - BLOCKFROST_PROJECT_ID_PREPROD=${BLOCKFROST_PROJECT_ID_PREPROD}
+      - BLOCKFROST_PROJECT_ID_MAINNET=${BLOCKFROST_PROJECT_ID_MAINNET}
+      - BLOCKFROST_TIMEOUT=8000
+      - KOIOS_TIMEOUT=10000
+      - ENABLE_KOIOS_FALLBACK=true
+      - LOG_LEVEL=info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4004/odata/v4/cardano-odata/$metadata"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local development with hot reload
+  sap-cardano-odata-dev:
+    build:
+      context: .
+      target: builder
+    image: sap-cardano-odata:dev
+    container_name: sap-cardano-odata-dev
+    ports:
+      - "4005:4004"
+    environment:
+      - NODE_ENV=development
+      - PORT=4004
+      - DEFAULT_CARDANO_NETWORK=preview
+      - BLOCKFROST_PROJECT_ID_PREVIEW=${BLOCKFROST_PROJECT_ID_PREVIEW:-}
+    volumes:
+      - ./srv:/app/srv
+      - ./db:/app/db
+    command: ["npm", "run", "dev"]
+    profiles:
+      - dev

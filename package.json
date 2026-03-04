@@ -1,0 +1,59 @@
+{
+  "name": "sap-cardano-odata-v4",
+  "version": "2.0.0",
+  "description": "SAP–Cardano OData V4 API with CAP & Aiken Smart Contracts",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ODATANO/ODATANO.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "dev": "cds watch",
+    "build": "tsc --build",
+    "build:watch": "tsc --build --watch",
+    "test": "jest",
+    "test:unit": "jest test/unit",
+    "test:integration": "jest test/integration",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "aiken:build": "cd aiken-contracts && aiken build",
+    "aiken:check": "cd aiken-contracts && aiken check",
+    "aiken:test": "cd aiken-contracts && aiken test",
+    "aiken:docs": "cd aiken-contracts && aiken docs",
+    "docker:build": "docker build -t sap-cardano-odata .",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "dependencies": {
+    "@sap/cds": "^8.5.0",
+    "@sap/cds-dk": "^8.5.0",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^9.17.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": ":memory:"
+        }
+      }
+    }
+  }
+}
