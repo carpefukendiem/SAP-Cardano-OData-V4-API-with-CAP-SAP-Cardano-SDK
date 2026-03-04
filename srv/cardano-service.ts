@@ -487,6 +487,41 @@ module.exports = cds.service.impl(async function (this: cds.ApplicationService) 
   });
 
   // ============================================================
+  // HEALTH CHECK
+  // ============================================================
+
+  this.on('READ', 'HealthCheck', async (_req) => {
+    const start = Date.now();
+    const cacheStats = indexer.getCacheStats?.() ?? { size: 0, entries: [] };
+
+    let blockchainStatus = 'unknown';
+    let latestBlock: Record<string, unknown> | null = null;
+    try {
+      latestBlock = await indexer.getLatestBlock('preprod') as Record<string, unknown>;
+      blockchainStatus = 'connected';
+    } catch {
+      blockchainStatus = 'degraded';
+    }
+
+    return {
+      status: blockchainStatus === 'connected' ? 'healthy' : 'degraded',
+      version: process.env['npm_package_version'] ?? '1.0.0',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
+      blockchain: {
+        status: blockchainStatus,
+        network: 'preprod',
+        latestBlock: latestBlock ? {
+          height: latestBlock['height'] ?? latestBlock['block_height'],
+          slot: latestBlock['slot'] ?? latestBlock['abs_slot'],
+        } : null,
+        responseTimeMs: Date.now() - start,
+      },
+      cache: cacheStats,
+    };
+  });
+
+  // ============================================================
   // ORACLE ACTIONS
   // ============================================================
 

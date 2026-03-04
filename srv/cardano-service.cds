@@ -44,6 +44,21 @@ service CardanoODataService @(path: '/odata/v4/cardano-odata') {
   entity NetworkInformation as projection on db.NetworkInformation;
 
   // ============================================================
+  // HEALTH CHECK
+  // ============================================================
+
+  @readonly
+  entity HealthCheck {
+    key id        : String default 'health';
+    status        : String;
+    version       : String;
+    timestamp     : String;
+    uptime        : Integer;
+    blockchain    : LargeString; // JSON object
+    cache         : LargeString; // JSON object
+  }
+
+  // ============================================================
   // SAP SMART CONTRACT ENTITIES
   // ============================================================
 

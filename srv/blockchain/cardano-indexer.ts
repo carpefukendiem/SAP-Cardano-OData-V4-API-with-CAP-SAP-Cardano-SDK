@@ -202,6 +202,16 @@ export class CardanoIndexer {
     return this.cache.size;
   }
 
+  getCacheStats(): { size: number; entries: Array<{ key: string; ageMs: number; ttlMs: number }> } {
+    const now = Date.now();
+    const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
+      key,
+      ageMs: now - (entry as IndexerCacheEntry<unknown>).cachedAt.getTime(),
+      ttlMs: (entry as IndexerCacheEntry<unknown>).ttlMs,
+    }));
+    return { size: this.cache.size, entries };
+  }
+
   evictExpired(): number {
     const now = Date.now();
     let evicted = 0;

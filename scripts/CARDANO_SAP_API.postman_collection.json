@@ -1,0 +1,448 @@
+{
+  "info": {
+    "name": "SAP–Cardano OData V4 API",
+    "description": "Complete Postman collection for the SAP–Cardano OData V4 API built with CAP. Covers blockchain data reads, smart contract actions, and all 5 error scenarios.\n\nBase URL: http://localhost:4004/odata/v4/cardano-odata\n\nSet the {{baseUrl}} variable to your server address before running.",
+    "_postman_id": "sap-cardano-odata-v4-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",  "value": "http://localhost:4004/odata/v4/cardano-odata", "type": "string" },
+    { "key": "network",  "value": "preprod", "type": "string" },
+    { "key": "txHash",   "value": "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65ad959996", "type": "string" },
+    { "key": "address",  "value": "addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz", "type": "string" },
+    { "key": "blockHash","value": "356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Metadata & Health",
+      "item": [
+        {
+          "name": "Service Metadata ($metadata)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/$metadata", "host": ["{{baseUrl}}"], "path": ["$metadata"] },
+            "description": "Returns the OData V4 service metadata document listing all entity sets and actions."
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+            "description": "Returns service health, blockchain connectivity status, cache stats, and version."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Blockchain Reads",
+      "item": [
+        {
+          "name": "Get Transaction by Hash",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Transactions('{{txHash}}')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Transactions('{{txHash}}')"]
+            },
+            "description": "Fetch a single Cardano transaction by its 64-character hex hash."
+          }
+        },
+        {
+          "name": "List Transactions (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Transactions?$top=10&$skip=0&$count=true&$select=txHash,block,fees,status",
+              "host": ["{{baseUrl}}"],
+              "path": ["Transactions"],
+              "query": [
+                { "key": "$top", "value": "10" },
+                { "key": "$skip", "value": "0" },
+                { "key": "$count", "value": "true" },
+                { "key": "$select", "value": "txHash,block,fees,status" }
+              ]
+            },
+            "description": "Paginated list of transactions with $top, $skip, $count, and $select."
+          }
+        },
+        {
+          "name": "Get Address Info",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Addresses('{{address}}')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Addresses('{{address}}')"]
+            },
+            "description": "Get ADA balance, UTxO set, and stake address for a Cardano address."
+          }
+        },
+        {
+          "name": "Get Block by Hash",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Blocks('{{blockHash}}')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Blocks('{{blockHash}}')"]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Block",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Blocks('latest')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Blocks('latest')"]
+            },
+            "description": "Returns the current chain tip (latest confirmed block)."
+          }
+        },
+        {
+          "name": "Get Epoch Info",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Epochs(450)",
+              "host": ["{{baseUrl}}"],
+              "path": ["Epochs(450)"]
+            }
+          }
+        },
+        {
+          "name": "Get Account / Stake Info",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-cardano-network", "value": "{{network}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/Accounts('stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgm')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Accounts('stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgm')"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. OData Query Options",
+      "item": [
+        {
+          "name": "Filter SupplyChain by status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/SupplyChainEvents?$filter=status eq 'InTransit'&$orderby=createdAt desc&$top=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["SupplyChainEvents"],
+              "query": [
+                { "key": "$filter", "value": "status eq 'InTransit'" },
+                { "key": "$orderby", "value": "createdAt desc" },
+                { "key": "$top", "value": "20" }
+              ]
+            },
+            "description": "OData $filter + $orderby + $top on supply chain events."
+          }
+        },
+        {
+          "name": "Filter ESG Credits — active VCS vintage >= 2022",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/EsgCredits?$filter=standard eq 'VCS' and vintageYear ge 2022 and status eq 'active'&$select=creditId,standard,vintageYear,quantity&$count=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["EsgCredits"],
+              "query": [
+                { "key": "$filter", "value": "standard eq 'VCS' and vintageYear ge 2022 and status eq 'active'" },
+                { "key": "$select", "value": "creditId,standard,vintageYear,quantity" },
+                { "key": "$count", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Expand SupplyChain with Checkpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/SupplyChainEvents?$expand=checkpoints&$top=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["SupplyChainEvents"],
+              "query": [
+                { "key": "$expand", "value": "checkpoints" },
+                { "key": "$top", "value": "5" }
+              ]
+            },
+            "description": "Inline-expand the checkpoints navigation property."
+          }
+        },
+        {
+          "name": "Filter Settlements by status eq Pending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/PaymentSettlements?$filter=status eq 'Pending'&$orderby=totalAmount desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["PaymentSettlements"],
+              "query": [
+                { "key": "$filter", "value": "status eq 'Pending'" },
+                { "key": "$orderby", "value": "totalAmount desc" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Smart Contract Actions",
+      "item": [
+        {
+          "name": "InitSupplyChain",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sapDocumentId\": \"4500000001\",\n  \"sapSystemId\": \"PRD\",\n  \"initiatorAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"originLocation\": \"DEHAM\",\n  \"destinationLocation\": \"SGSIN\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/InitSupplyChain",
+              "host": ["{{baseUrl}}"],
+              "path": ["InitSupplyChain"]
+            },
+            "description": "Creates a new supply chain tracking UTxO on Cardano. Returns an unsigned CBOR transaction to be signed externally."
+          }
+        },
+        {
+          "name": "UpdateSupplyChainStatus",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"txHash\": \"{{txHash}}\",\n  \"newStatus\": \"InTransit\",\n  \"location\": \"NLRTM\",\n  \"updaterAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/UpdateSupplyChainStatus",
+              "host": ["{{baseUrl}}"],
+              "path": ["UpdateSupplyChainStatus"]
+            }
+          }
+        },
+        {
+          "name": "IssueEsgCredit",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"standard\": \"VCS\",\n  \"vintageYear\": 2023,\n  \"quantity\": 1000,\n  \"projectId\": \"VCS-12345\",\n  \"issuerAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"sapDocumentId\": \"4500000002\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/IssueEsgCredit",
+              "host": ["{{baseUrl}}"],
+              "path": ["IssueEsgCredit"]
+            },
+            "description": "Issues verifiable carbon credits as Cardano native tokens linked to a SAP PO."
+          }
+        },
+        {
+          "name": "RetireEsgCredit",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"txHash\": \"{{txHash}}\",\n  \"retirementBeneficiary\": \"ACME Corp — 2023 Net Zero Commitment\",\n  \"retiredByAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/RetireEsgCredit",
+              "host": ["{{baseUrl}}"],
+              "path": ["RetireEsgCredit"]
+            }
+          }
+        },
+        {
+          "name": "CreateSettlement",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sapDocumentId\": \"5000000001\",\n  \"buyerAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"sellerAddress\": \"addr_test1qzjkvdnkz5r3e5qlm8c06lp7xzjqjxjejxjxjejxjxjxjxjxjxj\",\n  \"totalAmountLovelace\": \"50000000\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/CreateSettlement",
+              "host": ["{{baseUrl}}"],
+              "path": ["CreateSettlement"]
+            },
+            "description": "Creates an escrow payment settlement. Funds are locked until both parties approve."
+          }
+        },
+        {
+          "name": "ApproveSettlement",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"txHash\": \"{{txHash}}\",\n  \"approverAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ApproveSettlement",
+              "host": ["{{baseUrl}}"],
+              "path": ["ApproveSettlement"]
+            }
+          }
+        },
+        {
+          "name": "RegisterAsset",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assetName\": \"Industrial Pump XYZ-500\",\n  \"sapAssetId\": \"A-000001\",\n  \"ownerAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"metadata\": { \"manufacturer\": \"ACME\", \"serialNumber\": \"SN-12345\", \"purchaseDate\": \"2023-01-15\" },\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/RegisterAsset",
+              "host": ["{{baseUrl}}"],
+              "path": ["RegisterAsset"]
+            },
+            "description": "Registers a physical SAP asset on-chain with immutable provenance."
+          }
+        },
+        {
+          "name": "PostOracleValue",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dataKey\": \"EUR_USD_RATE\",\n  \"value\": \"108542\",\n  \"validForSeconds\": 3600,\n  \"oracleAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"sapSystemId\": \"PRD\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/PostOracleValue",
+              "host": ["{{baseUrl}}"],
+              "path": ["PostOracleValue"]
+            },
+            "description": "Posts a SAP-sourced data value (price, rate, etc.) to the Cardano oracle contract."
+          }
+        },
+        {
+          "name": "BuildTransaction (raw CBOR)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inputs\": [\"{{txHash}}#0\"],\n  \"outputs\": [\n    { \"address\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\", \"lovelace\": \"5000000\" }\n  ],\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/BuildTransaction",
+              "host": ["{{baseUrl}}"],
+              "path": ["BuildTransaction"]
+            },
+            "description": "Builds an unsigned transaction CBOR. Sign externally with your Cardano wallet or HSM."
+          }
+        },
+        {
+          "name": "SubmitTransaction",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedCbor\": \"84a500...\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/SubmitTransaction",
+              "host": ["{{baseUrl}}"],
+              "path": ["SubmitTransaction"]
+            },
+            "description": "Submits a fully-signed CBOR transaction to the Cardano network."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Error Scenarios",
+      "item": [
+        {
+          "name": "400 — Invalid tx hash",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/Transactions('not-a-valid-hash')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Transactions('not-a-valid-hash')"]
+            },
+            "description": "Returns HTTP 400 with OData error: invalid transaction hash format."
+          }
+        },
+        {
+          "name": "404 — Transaction not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/Transactions('0000000000000000000000000000000000000000000000000000000000000000')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Transactions('0000000000000000000000000000000000000000000000000000000000000000')"]
+            },
+            "description": "Returns HTTP 404 — transaction hash is valid format but does not exist on-chain."
+          }
+        },
+        {
+          "name": "422 — Invalid vintage year (contract validation)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"standard\": \"VCS\",\n  \"vintageYear\": 1850,\n  \"quantity\": 1000,\n  \"projectId\": \"VCS-99999\",\n  \"issuerAddress\": \"addr_test1qpkxr3kpzex93m646qr7w82d56md2kchtsv9jy39dykn4cmcxuuneyeqhdc4wy7de9mk54fndmckahxwqtwy3qg8pums5vlxhz\",\n  \"sapDocumentId\": \"4500000099\",\n  \"network\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/IssueEsgCredit",
+              "host": ["{{baseUrl}}"],
+              "path": ["IssueEsgCredit"]
+            },
+            "description": "Returns HTTP 422 — vintage year 1850 is outside the allowed range (1990–2100)."
+          }
+        },
+        {
+          "name": "503 — Backend unavailable (bad API key)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-cardano-network", "value": "mainnet" },
+              { "key": "x-blockfrost-key", "value": "invalid_key_triggers_403" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/Transactions('{{txHash}}')",
+              "host": ["{{baseUrl}}"],
+              "path": ["Transactions('{{txHash}}')"]
+            },
+            "description": "Returns HTTP 503 when both Blockfrost (403) and Koios (5xx) are unavailable."
+          }
+        }
+      ]
+    }
+  ]
+}
