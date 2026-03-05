@@ -12,7 +12,9 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "dev": "cds watch",
+    "predev": "node scripts/kill-port.js",
+    "dev": "PORT=4004 cds watch --port 4004",
+    "stop": "node scripts/kill-port.js",
     "build": "tsc --build",
     "build:watch": "tsc --build --watch",
     "test": "jest",
